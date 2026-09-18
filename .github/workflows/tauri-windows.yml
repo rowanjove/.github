@@ -27,6 +27,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        if: hashFiles('**/pnpm-lock.yaml') != ''
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -43,11 +49,15 @@ jobs:
           workspaces: ${{ inputs.working-directory }}
 
       - name: Install Frontend Dependencies
+        shell: pwsh
         run: |
-          if (Test-Path package-lock.json) { npm ci }
-          elseif (Test-Path pnpm-lock.yaml) { npx pnpm install --frozen-lockfile }
+          if (Test-Path pnpm-lock.yaml) { pnpm install --frozen-lockfile }
+          elseif (Test-Path package-lock.json) { npm ci }
           elseif (Test-Path yarn.lock) { npx yarn install --frozen-lockfile }
           else { npm install }
 
       - name: Build Application
-        run: npm run tauri build -- --debug
+        shell: pwsh
+        run: |
+          if (Test-Path pnpm-lock.yaml) { pnpm tauri build --debug }
+          else { npm run tauri build -- --debug }
