@@ -1,0 +1,50 @@
+name: Bug Report
+description: Report a reproducible bug or error in the software
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue! Before filing, please ensure you are testing against the latest release.
+  - type: input
+    id: version
+    attributes:
+      label: Software Version & Environment
+      description: What version/tag are you running, and on which OS (e.g., Windows 11 23H2 x64)?
+      placeholder: "e.g., v1.0.2 on Windows 11 Build 22631"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Problem Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Describe what happened versus what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Provide clear, sequential steps to reproduce the behavior.
+      placeholder: |
+        1. Open '...'
+        2. Click on '....'
+        3. Observe error '...'
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Logs or Terminal Output
+      description: Relevant log snippets, terminal outputs, or debug messages.
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission Checks
+      options:
+        - label: I have verified that this issue is not already reported.
+          required: true
+        - label: I have confirmed that no private credentials, personal data, or API keys are included in this report.
+          required: true

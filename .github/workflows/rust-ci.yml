@@ -1,0 +1,44 @@
+name: Reusable Rust CI
+
+on:
+  workflow_call:
+    inputs:
+      rust-version:
+        required: false
+        type: string
+        default: 'stable'
+      working-directory:
+        required: false
+        type: string
+        default: '.'
+
+jobs:
+  rust-check:
+    name: Rust Check & Test
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ inputs.rust-version }}
+          components: clippy, rustfmt
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ inputs.working-directory }}
+
+      - name: Format Check
+        run: cargo fmt --all -- --check
+
+      - name: Clippy Linter
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Run Tests
+        run: cargo test --all-targets --all-features --verbose

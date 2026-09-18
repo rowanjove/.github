@@ -1,0 +1,43 @@
+name: Reusable Security Audit
+
+on:
+  workflow_call:
+    inputs:
+      ecosystem:
+        required: false
+        type: string
+        default: 'all' # 'rust', 'python', 'node', or 'all'
+
+jobs:
+  audit:
+    name: Security & Vulnerability Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Audit Rust Dependencies
+        if: ${{ inputs.ecosystem == 'rust' || inputs.ecosystem == 'all' }}
+        continue-on-error: true
+        run: |
+          if [ -f Cargo.lock ]; then
+            cargo install cargo-audit
+            cargo audit
+          fi
+
+      - name: Audit Node Dependencies
+        if: ${{ inputs.ecosystem == 'node' || inputs.ecosystem == 'all' }}
+        continue-on-error: true
+        run: |
+          if [ -f package.json ]; then
+            npm audit --audit-level=high
+          fi
+
+      - name: Audit Python Dependencies
+        if: ${{ inputs.ecosystem == 'python' || inputs.ecosystem == 'all' }}
+        continue-on-error: true
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install pip-audit
+            pip-audit -r requirements.txt
+          fi

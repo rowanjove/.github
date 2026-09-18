@@ -1,0 +1,29 @@
+name: Feature Request
+description: Suggest an idea, enhancement, or architectural improvement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We prioritize tools that solve clear friction points while adhering to local-first and quiet computing principles.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Is your feature request related to a problem or limitation?
+      placeholder: "I encounter friction when trying to..."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe what you would like to see happen and how it preserves local-first control.
+      placeholder: "A clean way to solve this would be..."
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or workarounds you have considered.

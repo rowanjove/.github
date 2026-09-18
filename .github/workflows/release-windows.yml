@@ -1,0 +1,40 @@
+name: Reusable Windows Release Packaging
+
+on:
+  workflow_call:
+    inputs:
+      artifact-name:
+        required: true
+        type: string
+      artifact-path:
+        required: true
+        type: string
+
+jobs:
+  package-and-checksum:
+    name: Generate Checksums & Package
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate Checksums
+        shell: pwsh
+        run: |
+          if (Test-Path "${{ inputs.artifact-path }}") {
+            $files = Get-ChildItem -Path "${{ inputs.artifact-path }}" -File
+            $hashes = foreach ($file in $files) {
+              $hash = Get-FileHash -Path $file.FullName -Algorithm SHA256
+              "$($hash.Hash.ToLower())  $($file.Name)"
+            }
+            $hashes | Out-File -FilePath "SHA256SUMS.txt" -Encoding utf8
+            Write-Host "Generated SHA256SUMS.txt successfully."
+          } else {
+            Write-Warning "Artifact path ${{ inputs.artifact-path }} not found."
+          }
+
+      - name: Upload Checksums
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}-checksums
+          path: SHA256SUMS.txt

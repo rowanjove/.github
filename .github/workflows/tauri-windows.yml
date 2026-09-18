@@ -1,0 +1,53 @@
+name: Reusable Tauri Windows Build
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: false
+        type: string
+        default: '20'
+      rust-version:
+        required: false
+        type: string
+        default: 'stable'
+      working-directory:
+        required: false
+        type: string
+        default: '.'
+
+jobs:
+  build-windows:
+    name: Build Tauri Windows App
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ inputs.rust-version }}
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ inputs.working-directory }}
+
+      - name: Install Frontend Dependencies
+        run: |
+          if (Test-Path package-lock.json) { npm ci }
+          elseif (Test-Path pnpm-lock.yaml) { npx pnpm install --frozen-lockfile }
+          elseif (Test-Path yarn.lock) { npx yarn install --frozen-lockfile }
+          else { npm install }
+
+      - name: Build Application
+        run: npm run tauri build -- --debug
