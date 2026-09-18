@@ -23,6 +23,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        if: hashFiles('**/pnpm-lock.yaml') != ''
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -30,8 +36,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          if [ -f package-lock.json ]; then npm ci;
-          elif [ -f pnpm-lock.yaml ]; then npx pnpm install --frozen-lockfile;
+          if [ -f pnpm-lock.yaml ]; then pnpm install --frozen-lockfile;
+          elif [ -f package-lock.json ]; then npm ci;
           elif [ -f yarn.lock ]; then npx yarn install --frozen-lockfile;
           else npm install; fi
 
